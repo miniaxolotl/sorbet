@@ -1,4 +1,5 @@
 #include "component.h"
+#include <stdlib.h>
 
 /*****************************************************
  * ENUMERATIONS

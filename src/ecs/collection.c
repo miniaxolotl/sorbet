@@ -1,4 +1,5 @@
 #include "collection.h"
+#include <stdlib.h>
 
 /*****************************************************
  * ENUMERATIONS
@@ -22,40 +23,51 @@
 
 COLLECTION_T* collection__create()
 {
-	COLLECTION_T* colection = malloc((sizeof(COLLECTION_T)));
-	if(!colection) { return NULL; }
+	COLLECTION_T* collection = malloc(sizeof(COLLECTION_T));
+	if(!collection) { return NULL; }
 
-	colection->system_count = 0;
-	colection->system_list = vector__create(1);
+	collection->system_count = 0;
+	collection->system_list = vector__create(1);
 
-	colection->entity_count = 0;
-	colection->entity_list = vector__create(1);
+	collection->entity_count = 0;
+	collection->entity_list = vector__create(1);
 
-	colection->id_count = 0;
-	colection->id_pool = queue_create(ECS__ENTITIES_MAX);
+	collection->id_count = 0;
+	collection->id_pool = queue_create(ECS__ENTITIES_MAX);
 
-	return colection;
+	return collection;
 } // collection__create()
 
 bool collection__register_system(COLLECTION_T* collection, SYSTEM_T* system)
 {
+	if(!collection || !system) { return false; }
+
 	vector__insert(collection->system_list, system);
 	system->status = DISABLED;
 
 	collection->system_count++;
+	return true;
 } // collection__register_system()
 
 bool collection__register_entity(COLLECTION_T* collection, ENTITY_T* entity)
 {
+	if(!collection || !entity) { return false; }
+
 	ID_T* entity_id = NULL;
 
 	if(queue_empty(collection->id_pool)
 		&& (collection->id_count < ECS__ENTITIES_MAX))
 	{
 		ID_T* new_id = malloc(sizeof(ID_T));
+		if(!new_id) { return false; }
+
 		*new_id = collection->id_count++;
 
-		queue_push(collection->id_pool, new_id);
+		if(!queue_push(collection->id_pool, new_id))
+		{
+			free(new_id);
+			return false;
+		}
 	}
 
 	entity_id = queue_pop(collection->id_pool);
@@ -75,23 +87,24 @@ bool collection__register_entity(COLLECTION_T* collection, ENTITY_T* entity)
 
 void collection__link_components(COLLECTION_T* collection)
 {
-	size_t size = collection->entity_list->size;
-	size_t used = collection->entity_list->used;
-
 	ENTITY_T* entity = NULL;
 	COMPONENT_T* component = NULL;
 	SYSTEM_T* system = NULL;
 
-	for(size_t i = 0; i<size; i++)
+	for(size_t i = 0; i < collection->entity_list->used; i++)
 	{
 		entity = collection->entity_list->data[i];
-		for(size_t j = 0; j<entity->components->size && entity; j++)
+		if(!entity) { continue; }
+
+		for(size_t j = 0; j < entity->components->used; j++)
 		{
 			component = entity->components->data[j];
-			for(size_t k = 0; k<collection->system_list->size && component; k++)
+			if(!component) { continue; }
+
+			for(size_t k = 0; k < collection->system_list->used; k++)
 			{
 				system = collection->system_list->data[k];
-				if(system)
+				if(system && system->system_id == component->system_id)
 				{
 					llist__push_head(system->components,
 						*component->entity->entity_id, component);
@@ -104,7 +117,7 @@ void collection__link_components(COLLECTION_T* collection)
 void collection__flush_components(COLLECTION_T* collection)
 {
 	SYSTEM_T* system = NULL;
-	for(size_t i = 0; i<collection->system_list->size; i++)
+	for(size_t i = 0; i < collection->system_list->used; i++)
 	{
 		system = collection->system_list->data[i];
 		if(system)
@@ -112,7 +125,7 @@ void collection__flush_components(COLLECTION_T* collection)
 			system__flush(system);
 		}
 	}
-} // collection__flush_componentsI()
+} // collection__flush_components()
 
 
 void collection__tick(SORBET_T* sorbet, COLLECTION_T* collection,
@@ -121,18 +134,17 @@ void collection__tick(SORBET_T* sorbet, COLLECTION_T* collection,
 	SYSTEM_T* system = NULL;
 	LLIST_NODE_T* node = NULL;
 	
-	for(size_t i = 0; i<collection->system_count; i++)
+	for(size_t i = 0; i < collection->system_count; i++)
 	{
 		system = collection->system_list->data[i];
-		node = system->components->head;
+		if(!system || system->status != ENABLED) { continue; }
 
+		node = system->components->head;
 		while(node)
 		{
-			if(node) {
-				system->func(sorbet, system->components, event,
-					node->data, delta);
-				node = node->next;
-			}
+			system->func(sorbet, system->components, event,
+				node->data, delta);
+			node = node->next;
 		}
 	}
 } // collection__tick()

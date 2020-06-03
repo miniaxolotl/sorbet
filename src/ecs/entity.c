@@ -1,4 +1,5 @@
 #include "entity.h"
+#include <stdlib.h>
 
 /*****************************************************
  * ENUMERATIONS
@@ -39,4 +40,5 @@ bool entity__register_component(ENTITY_T* entity, COMPONENT_T* component)
 {
 	component->entity = entity;
 	vector__insert(entity->components, component);
+	return true;
 } // entity__register_component()
