@@ -5,7 +5,6 @@
 # ------------
 # the following targets are available :
 #	$ make				link and compile
-#	$ make				link and compile
 #   $ make windows	 	link and compile to windows
 #   $ make run		 	run program linux && windows
 
@@ -21,7 +20,7 @@ OBJ_DIR = obj
 LIB_DIR = lib
 INCLUDE_DIR = include/sorbet
 
-COMPILER_FLAGS = -Wall
+COMPILER_FLAGS = -Wall -Wextra -Werror -O2
 LINKER_FLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -llua
 CXX = gcc
 
@@ -46,7 +45,7 @@ all : $(OBJS)
 
 $(OBJ_DIR)/static/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
-	$(CXX) -fPIC -c $? -o $@
+	$(CXX) $(COMPILER_FLAGS) -fPIC -c $< -o $@
 
 ###################################### utility scripts
 
