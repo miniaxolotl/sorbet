@@ -56,12 +56,12 @@ HASHMAP_T* hashmap__create(size_t initial_size);
 size_t hashmap__code(HASHMAP_T* hashtable, size_t key);
 
 /**
- * get an index code from a key value.
+ * get an item from a key value.
  * @param hashtable the table to refrence from.
  * @param key the key of the item to find.
  * @returns the item at the specified index.
  **/
-HASHMAP_T* hashmap__search(HASHMAP_T* hashtable, size_t key);
+HASHMAP_ITEM_T* hashmap__search(HASHMAP_T* hashtable, size_t key);
 
 /**
  * insert an item into a hashtable.

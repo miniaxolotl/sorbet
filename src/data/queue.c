@@ -26,12 +26,18 @@ QUEUE_T* queue_create(size_t size)
 	if(!queue) { return NULL; }
 
 	queue->data = malloc(size * sizeof(void*));
-	if(!queue->data) { return NULL; }
+	if(!queue->data)
+	{
+		free(queue);
+		return NULL;
+	}
 	
-	queue->front = queue->size = 0;
+	queue->front = 0;
     queue->rear = size - 1;
     queue->used = 0;
 	queue->size = size;
+
+	return queue;
 } // queue_create()
 
 
@@ -78,3 +84,14 @@ void* queue_pop(QUEUE_T* q)
 
     return item;
 } // () queue_pop()
+
+void* queue_cycle(QUEUE_T* queue)
+{
+	void* item = queue_pop(queue);
+	if(item)
+	{
+		queue_push(queue, item);
+		return item;
+	}
+	return NULL;
+} // queue_cycle()
