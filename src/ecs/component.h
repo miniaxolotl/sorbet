@@ -29,15 +29,16 @@ typedef struct COMPONENT COMPONENT_T;
  * TYPE IMPLEMENTATIONS
  *****************************************************/
 
-typedef struct COMPONENT {
-	/** id of the system the payload belongs to. */
-	ID_T system_id;
-	/** the entity the payload belong to. */
-	ENTITY_T* entity;
-	/** payload attached to component. */
-	void* payload;
-	/** status of the component. */
-	STATUS_T status;
+typedef struct COMPONENT
+{
+  /** id of the system the payload belongs to. */
+  ID_T system_id;
+  /** the entity the payload belong to. */
+  ENTITY_T *entity;
+  /** payload attached to component. */
+  void *payload;
+  /** status of the component. */
+  STATUS_T status;
 } COMPONENT_T;
 
 /*****************************************************
@@ -54,6 +55,12 @@ typedef struct COMPONENT {
  * @param system_id system the component belongs to.
  * @returns returns a generated component.
  */
-COMPONENT_T* component__create(void* payload, ID_T system_id);
+COMPONENT_T *component__create(void *payload, ID_T system_id);
+
+/**
+ * destroy a component and free it's resources.
+ * @param component component to destroy.
+ */
+void component__destroy(COMPONENT_T *component);
 
 #endif

@@ -128,7 +128,7 @@ void sorbet__tick(SORBET_T* sorbet, SDL_Event* event, SORBET_LENGTH_T delta)
 		for(size_t i = 0; i < collection->entity_count; i++)
 		{
 			ENTITY_T* entity = collection->entity_list->data[i];
-			if(entity && entity->update)
+			if(entity && entity->status == ENABLED && entity->update)
 			{
 				entity->update(sorbet, entity->payload, delta);
 			}
@@ -137,7 +137,7 @@ void sorbet__tick(SORBET_T* sorbet, SDL_Event* event, SORBET_LENGTH_T delta)
 		for(size_t i = 0; i < collection->entity_count; i++)
 		{
 			ENTITY_T* entity = collection->entity_list->data[i];
-			if(entity && entity->render)
+			if(entity && entity->status == ENABLED && entity->render)
 			{
 				entity->render(sorbet, entity->payload, delta);
 			}
@@ -175,6 +175,7 @@ void sorbet__run(SORBET_T* sorbet)
 		DELTA = (TIME - LAST) > (FRAMERATE * 3)
 			? (FRAMERATE * 3) / 1000.0 : (TIME - LAST) / 1000.0;
 
+		memset(&event, 0, sizeof(SDL_Event));
 		sorbet__tick(sorbet, &event, DELTA);
 
 		LAST = TIME;
