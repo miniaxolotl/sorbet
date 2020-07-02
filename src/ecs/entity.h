@@ -30,19 +30,20 @@ typedef struct ENTITY ENTITY_T;
  * TYPE IMPLEMENTATIONS
  *****************************************************/
 
-typedef struct ENTITY {
-	/** id of the entity. */
-	ID_T* entity_id;
-	/** list of components attached to entity. */
-	VECTOR_T* components;
-	/** payload attached to entity. */
-	void* payload;
-	/** status of the entity. */
-	STATUS_T status;
-	/** update the object */
-	void (*update)(SORBET_T* sorbet, void* payload, SORBET_LENGTH_T delta);
-	/** render the object */
-	void (*render)(SORBET_T* sorbet, void* payload, SORBET_LENGTH_T delta);
+typedef struct ENTITY
+{
+  /** id of the entity. */
+  ID_T *entity_id;
+  /** list of components attached to entity. */
+  VECTOR_T *components;
+  /** payload attached to entity. */
+  void *payload;
+  /** status of the entity. */
+  STATUS_T status;
+  /** update the object */
+  void (*update)(SORBET_T *sorbet, void *payload, SORBET_LENGTH_T delta);
+  /** render the object */
+  void (*render)(SORBET_T *sorbet, void *payload, SORBET_LENGTH_T delta);
 } ENTITY_T;
 
 /*****************************************************
@@ -59,7 +60,9 @@ typedef struct ENTITY {
  * @param update update function.
  * @param render render function.
  */
-ENTITY_T* entity__create(void* payload, void (*update), void (*render));
+ENTITY_T *entity__create(void *payload,
+                         void (*update)(SORBET_T *sorbet, void *payload, SORBET_LENGTH_T delta),
+                         void (*render)(SORBET_T *sorbet, void *payload, SORBET_LENGTH_T delta));
 
 /**
  * attach a component to an entity.
@@ -67,6 +70,12 @@ ENTITY_T* entity__create(void* payload, void (*update), void (*render));
  * @param component component to attach to entity.
  * @returns true if success false if not.
  */
-bool entity__register_component(ENTITY_T* entity, COMPONENT_T* component);
+bool entity__register_component(ENTITY_T *entity, COMPONENT_T *component);
+
+/**
+ * destroy an entity and free it's resources.
+ * @param entity entity to destroy.
+ */
+void entity__destroy(ENTITY_T *entity);
 
 #endif

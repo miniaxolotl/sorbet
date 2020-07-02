@@ -50,7 +50,10 @@ typedef struct SYSTEM
  * @param system_id identifier code of the system.
  * @returns a generated system.
  */
-SYSTEM_T *system__create(void(*func), ID_T system_id);
+SYSTEM_T *system__create(
+    void (*func)(SORBET_T *sorbet, LLIST_T *components, SDL_Event *event,
+                 COMPONENT_T *component, SORBET_LENGTH_T delta),
+    ID_T system_id);
 
 /**
  * attach a component to system.
@@ -65,5 +68,11 @@ bool system__register_component(SYSTEM_T *system, COMPONENT_T *component);
  * @param system system to modify.
  */
 void system__flush(SYSTEM_T *system);
+
+/**
+ * destroy a system and free it's resources.
+ * @param system system to destroy.
+ */
+void system__destroy(SYSTEM_T *system);
 
 #endif

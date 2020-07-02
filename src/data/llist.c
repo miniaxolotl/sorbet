@@ -198,6 +198,7 @@ LLIST_NODE_T* llist__peek_tail(LLIST_T* llist)
 
 LLIST_NODE_T* llist__cycle(LLIST_T* llist)
 {
+	if(!llist || !llist->head) { return NULL; }
 	LLIST_NODE_T* node = llist__pop(llist, llist->head->key);
 	if(node)
 	{
