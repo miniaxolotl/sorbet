@@ -5,8 +5,9 @@
 # ------------
 # the following targets are available :
 #	$ make				link and compile
-#   $ make windows	 	link and compile to windows
-#   $ make run		 	run program linux && windows
+#   $ make demo			build the snake demo
+#   $ make run_demo		run the snake demo
+#   $ make clean		remove build artifacts
 
 
 ###################################### config
@@ -21,7 +22,7 @@ LIB_DIR = lib
 INCLUDE_DIR = include/sorbet
 
 COMPILER_FLAGS = -Wall -Wextra -Werror -O2
-LINKER_FLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -llua
+LINKER_FLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -llua5.3
 CXX = gcc
 
 ###################################### targets
@@ -46,6 +47,18 @@ all : $(OBJS)
 $(OBJ_DIR)/static/%.o: $(SRC_DIR)/%.c
 	mkdir -p $(@D)
 	$(CXX) $(COMPILER_FLAGS) -fPIC -c $< -o $@
+
+###################################### demo
+
+DEMO_SRC = demo/main.c
+DEMO_BIN = $(BUILD_DIR)/snake_demo
+
+demo : all
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(COMPILER_FLAGS) $(DEMO_SRC) -I. -L$(LIB_DIR) -lsorbet $(LINKER_FLAGS) -o $(DEMO_BIN)
+
+run_demo : demo
+	./$(DEMO_BIN)
 
 ###################################### utility scripts
 
